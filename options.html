@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>ResetKioskRedux Options</title>
+    <title>ResetKioskRedux Settings</title>
 </head>
 
 <body>
@@ -11,7 +11,7 @@
 
     <label>
         Timeout (seconds):
-        <input type="number" id="timeoutSeconds" min="1" />
+        <input type="number" id="timeoutSeconds" min="30" />
     </label>
 
     <br><br>
@@ -19,6 +19,13 @@
     <label>
         <input type="checkbox" id="disableContextMenu" />
         Disable right-click context menu
+    </label>
+
+    <br><br>
+
+    <label>
+        <input type="checkbox" id="closeOtherTabsOnReset" />
+        Close all other tabs when homepage loads
     </label>
 
     <br><br>

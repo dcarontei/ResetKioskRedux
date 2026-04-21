@@ -1,11 +1,17 @@
 let timeoutSeconds = 1200;
 let disableContextMenu = false;
+let closeOtherTabsOnReset = false;
 let timer = null;
 
 // Load settings on startup
-browser.storage.sync.get(["timeoutSeconds", "disableContextMenu"]).then((res) => {
-  timeoutSeconds = res.timeoutSeconds ?? 1200; // 20 minutes default
+browser.storage.sync.get([
+  "timeoutSeconds",
+  "disableContextMenu",
+  "closeOtherTabsOnReset"
+]).then((res) => {
+  timeoutSeconds = res.timeoutSeconds ?? 1200;
   disableContextMenu = res.disableContextMenu ?? false;
+  closeOtherTabsOnReset = res.closeOtherTabsOnReset ?? false;
 });
 
 // Listen for settings changes
@@ -15,6 +21,9 @@ browser.storage.onChanged.addListener((changes) => {
   }
   if (changes.disableContextMenu) {
     disableContextMenu = changes.disableContextMenu.newValue;
+  }
+  if (changes.closeOtherTabsOnReset) {
+    closeOtherTabsOnReset = changes.closeOtherTabsOnReset.newValue;
   }
 });
 
@@ -33,7 +42,16 @@ function resetTimer(tabId) {
     const homeUrl = home.value;
 
     if (homeUrl) {
-      browser.tabs.update(tabId, { url: homeUrl });
+      await browser.tabs.update(tabId, { url: homeUrl });
+    }
+
+    if (closeOtherTabsOnReset) {
+      const allTabs = await browser.tabs.query({});
+      for (const tab of allTabs) {
+        if (tab.id !== tabId) {
+          browser.tabs.remove(tab.id);
+        }
+      }
     }
   }, timeoutSeconds * 1000);
 }
