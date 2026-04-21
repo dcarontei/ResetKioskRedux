@@ -3,6 +3,20 @@ let disableContextMenu = false;
 let closeOtherTabsOnReset = false;
 let timer = null;
 
+// --- KEEPALIVE: Prevent background suspension ---
+browser.alarms.create("keepAlive", {
+  periodInMinutes: 1
+});
+
+browser.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "keepAlive") {
+    // No-op: the wake-up itself keeps the service worker alive
+    // You may log if needed:
+    // console.debug("Keepalive alarm fired");
+  }
+});
+
+
 // Load settings on startup
 browser.storage.sync.get([
   "timeoutSeconds",
@@ -30,7 +44,7 @@ browser.storage.onChanged.addListener((changes) => {
 // Reset timer when content script notifies activity
 browser.runtime.onMessage.addListener((msg, sender) => {
   if (msg === "user-activity") {
-    //console.log("resetting timer");
+    console.log("resetting timer");
     resetTimer(sender.tab.id);
   }
 });
@@ -39,11 +53,10 @@ function resetTimer(tabId) {
   if (timer) clearTimeout(timer);
 
   timer = setTimeout(async () => {
-    // console.log("timer expired");
-
+    
     const home = await browser.browserSettings.homepageOverride.get({});
     const homeUrl = home.value;
-    //console.log("home is ", homeUrl);
+    console.log("timer expired, redirecting to ", homeUrl);
 
     if (homeUrl) {
       await browser.tabs.update(tabId, { url: homeUrl });
