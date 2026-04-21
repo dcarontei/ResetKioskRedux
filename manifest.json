@@ -1,0 +1,33 @@
+{
+    "manifest_version": 3,
+    "name": "ResetKioskRedux",
+    "version": "1.0",
+    "description": "Resets the current tab to the browser home page after inactivity.",
+    "icons": {
+        "48": "icons/icon.png",
+        "96": "icons/icon-96.png"
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "browserSettings"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_start"
+        }
+    ]
+}
