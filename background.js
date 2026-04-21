@@ -30,6 +30,7 @@ browser.storage.onChanged.addListener((changes) => {
 // Reset timer when content script notifies activity
 browser.runtime.onMessage.addListener((msg, sender) => {
   if (msg === "user-activity") {
+    //console.log("resetting timer");
     resetTimer(sender.tab.id);
   }
 });
@@ -38,8 +39,11 @@ function resetTimer(tabId) {
   if (timer) clearTimeout(timer);
 
   timer = setTimeout(async () => {
+    // console.log("timer expired");
+
     const home = await browser.browserSettings.homepageOverride.get({});
     const homeUrl = home.value;
+    //console.log("home is ", homeUrl);
 
     if (homeUrl) {
       await browser.tabs.update(tabId, { url: homeUrl });
